@@ -1,0 +1,20 @@
+name: "Build"
+on:
+    workflow_dispatch:
+    push:
+        branches:
+          - "main"
+          - "releases/**"
+          - "GAZE-**"
+    pull_request:
+        types: [opened, reopened, edited]
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout Repository Content
+              uses: actions/checkout@v2
+
+            - name: Make
+              run: make build
