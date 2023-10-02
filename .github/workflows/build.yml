@@ -11,10 +11,9 @@ on:
 jobs:
     build:
         runs-on: ubuntu-latest
-
         steps:
             - name: Checkout Repository Content
               uses: actions/checkout@v2
 
             - name: Make
-              run: make build
+              run: make build -B
