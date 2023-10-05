@@ -1,6 +1,8 @@
 FROM golang:1.21 as backend
-
 WORKDIR /src
+COPY go.mod /src
+COPY go.sum /src
+RUN go mod download
 ADD . /src
 RUN CGO_ENABLED=0 go build -o /src/.build/backend /src/cmd/gaze/
 

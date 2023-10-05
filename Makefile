@@ -8,4 +8,7 @@ build:
 	docker build -t gaze:$(branch)-$(version) --progress=plain -f build/package/Dockerfile .
 
 run: build
-	docker run -p 3000:3000 gaze:$(branch)-$(version)
+	docker run -it -p 3000:3000 gaze:$(branch)-$(version)
+
+deps:
+	go mod tidy
