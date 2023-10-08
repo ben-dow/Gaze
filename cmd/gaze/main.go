@@ -1,24 +1,61 @@
 package main
 
 import (
+	"context"
 	"github.com/ben-dow/Gaze/cmd/gaze/api/rest"
 	"github.com/ben-dow/Gaze/cmd/gaze/svc/config"
 	"github.com/ben-dow/Gaze/cmd/gaze/svc/db"
 	"github.com/ben-dow/Gaze/cmd/gaze/svc/logging"
-	"log"
-	"net/http"
+	"os"
+	"os/signal"
+	"sync"
+	"syscall"
+	"time"
 )
 
 func main() {
+	shutdown := make(chan os.Signal, 1)
+	signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM)
+
 	config.InitializeConfiguration()
-	logging.Info("Configuration Loaded")
+	logging.Debug("Configuration Loaded")
 
-	db.InitializeDatabase()
-	logging.Info("Database Loaded")
+	err := db.InitializeDatabase()
+	if err != nil {
+		logging.Error("could not initialize database connection %v", err)
+		return
+	}
+	logging.Debug("Database Loaded")
 
-	api := rest.NewRestApi()
-	logging.Info("API Initialized")
+	api := rest.NewRestApi(config.GetConfiguration().ServerAddress)
+	logging.Debug("API Initialized")
 
-	logging.Info("Starting Server")
-	log.Fatal(http.ListenAndServe(":3000", api))
+	logging.Debug("Starting API Server")
+	apiServerWg := &sync.WaitGroup{}
+	api.Start(apiServerWg)
+
+	logging.Info("Started")
+	for {
+		select {
+		case <-shutdown:
+			logging.Info("Shutting Down")
+
+			// Context for Shutdown
+			// Shutdowns must complete within 15 seconds
+			ctx, cncl := context.WithTimeout(context.Background(), time.Second*15)
+
+			logging.Trace("Stopping API Server")
+			err := api.Stop(ctx)
+			if err != nil {
+				logging.Error("could not shutdown api server. %v", err)
+			}
+
+			// Wait for wait groups to exit
+			apiServerWg.Wait()
+			logging.Trace("Shutdown Complete")
+
+			cncl()
+			return
+		}
+	}
 }

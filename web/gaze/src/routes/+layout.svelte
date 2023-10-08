@@ -1,7 +1,6 @@
 <script>
     import "../app.css";
-    import ExpandableNavItem from "$lib/nav/ExpandableNavItem.svelte"
-
+    import Navigation from "../lib/nav/Navigation.svelte";
 </script>
 
 
@@ -11,18 +10,13 @@
             <h1 class="text-5xl font-mono text-slate-200">Gaze</h1>
         </header>
         <div class="flex h-full">
-            <nav class="flex w-72 h-full bg-slate-700 p-4 flex-col justify-start text-slate-200 gap-y-4 overflow-auto">
-                <ExpandableNavItem itemName="Libraries" expand={false}/>
-            </nav>
+            <Navigation/>
             <main class="flex flex-col w-full  overflow-x-hidden overflow-y-auto shadow-inner shadow-slate-900 p-2">
                <slot />
             </main>
         </div>
     </div>
 </div>
-
-
-
 
 
 <style lang="postcss">

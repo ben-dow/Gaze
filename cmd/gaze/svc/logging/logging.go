@@ -1,9 +1,10 @@
 package logging
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/ben-dow/Gaze/cmd/gaze/svc/config"
-	"time"
+	"log"
 )
 
 const (
@@ -16,34 +17,40 @@ const (
 
 func Trace(entry string, formats ...any) {
 	if config.GetConfiguration().LogLevel <= LogLevelTrace {
-		log("TRACE", fmt.Sprintf(entry, formats...))
+		baseLog("TRACE", fmt.Sprintf(entry, formats...))
 	}
 }
 
 func Debug(entry string, formats ...any) {
 	if config.GetConfiguration().LogLevel <= LogLevelDebug {
-		log("DEBUG", fmt.Sprintf(entry, formats...))
+		baseLog("DEBUG", fmt.Sprintf(entry, formats...))
 	}
 }
 
 func Info(entry string, formats ...any) {
 	if config.GetConfiguration().LogLevel <= LogLevelInfo {
-		log("INFO", fmt.Sprintf(entry, formats...))
+		baseLog("INFO", fmt.Sprintf(entry, formats...))
 	}
 }
 
 func Warn(entry string, formats ...any) {
 	if config.GetConfiguration().LogLevel <= LogLevelWarn {
-		log("WARN", fmt.Sprintf(entry, formats...))
+		baseLog("WARN", fmt.Sprintf(entry, formats...))
 	}
 }
 
 func Error(entry string, formats ...any) {
 	if config.GetConfiguration().LogLevel <= LogLevelError {
-		log("ERROR", fmt.Sprintf(entry, formats...))
+		baseLog("ERROR", fmt.Sprintf(entry, formats...))
 	}
 }
 
-func log(levelStr string, entry string) {
-	fmt.Printf("%s [Gaze] [%s] - %s \n", time.Now().Format(time.RFC3339), levelStr, entry)
+func baseLog(levelStr string, entry string) {
+	var buffer bytes.Buffer
+	buffer.WriteString(fmt.Sprintf("[Gaze] [%s] ", levelStr))
+	space := []byte(" ")
+	buffer.Write(bytes.Repeat(space, 17-buffer.Len()))
+	buffer.WriteString(fmt.Sprintf("%s", entry))
+
+	log.Println(buffer.String())
 }
