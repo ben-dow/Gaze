@@ -1,5 +1,5 @@
 <script>
-    import testImg from "$lib/test_pic.png"
+    import testImg from "$lib/test_pic.jpg"
     import { Icon, Heart,ArrowDownCircle,Share, EllipsisHorizontal } from "svelte-hero-icons";
 </script>
 
