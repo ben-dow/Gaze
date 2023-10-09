@@ -6,12 +6,12 @@
 
 <div class="flex h-screen">
     <div class="flex-1 flex flex-col overflow-hidden">
-        <header class="flex justify-between items-center bg-slate-700 h-14 p-4">
+        <header class="flex justify-between items-center bg-gray-900 h-14 p-4">
             <h1 class="text-5xl font-mono text-slate-200">Gaze</h1>
         </header>
         <div class="flex h-full">
             <Navigation/>
-            <main class="flex flex-col w-full  overflow-x-hidden overflow-y-auto shadow-inner shadow-slate-900 p-2">
+            <main class="flex flex-col w-full  overflow-x-hidden overflow-y-auto  p-2">
                <slot />
             </main>
         </div>
@@ -21,7 +21,7 @@
 
 <style lang="postcss">
     :global(html) {
-        background-color: theme(colors.slate.800);
+        background-color: theme(colors.gray.950);
     }
 
     /* width */
