@@ -5,6 +5,8 @@ import (
 	"github.com/ben-dow/Gaze/cmd/gaze/api/socket"
 	"github.com/ben-dow/Gaze/cmd/gaze/svc/logging"
 	"net/http"
+	"os"
+	"path/filepath"
 	"sync"
 )
 
@@ -32,16 +34,19 @@ func (a *GazeRestApi) Stop(ctx context.Context) error {
 func NewRestApi(addr string) *GazeRestApi {
 	mux := http.NewServeMux()
 
+	spa := &sveleteHandler{
+		staticPath: "/opt/web",
+		indexPath:  "index.html",
+	}
+	mux.Handle("/", LoggingMiddleware(spa))
+
 	healthHandler := http.HandlerFunc(Health)
-	mux.Handle("/health", LoggingMiddleware(healthHandler))
+	mux.Handle("/api/health", LoggingMiddleware(healthHandler))
 
 	wsHandler := http.HandlerFunc(socket.WebSocketHttp)
-	mux.Handle("/ws", LoggingMiddleware(wsHandler))
+	mux.Handle("/api/ws", LoggingMiddleware(wsHandler))
 
-	fileServer := http.FileServer(http.Dir("/opt/web"))
-	mux.Handle("/", LoggingMiddleware(fileServer))
-
-	logging.Trace("Registered Routes with ServeMux")
+	logging.Trace("Registered Routes")
 
 	server := &http.Server{
 		Addr:    addr,
@@ -51,6 +56,32 @@ func NewRestApi(addr string) *GazeRestApi {
 	return &GazeRestApi{
 		server: server,
 	}
+}
+
+type sveleteHandler struct {
+	staticPath string
+	indexPath  string
+}
+
+func (h sveleteHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// Join internally call path.Clean to prevent directory traversal
+	path := filepath.Join(h.staticPath, r.URL.Path)
+
+	// check whether a file exists or is a directory at the given path
+	fi, err := os.Stat(path)
+	if os.IsNotExist(err) || fi.IsDir() {
+
+		// try appending html to file
+		path = path + ".html"
+		fi, err := os.Stat(path)
+		if os.IsNotExist(err) || fi.IsDir() {
+			// file does not exist or path is a directory, serve index.html
+			http.ServeFile(w, r, filepath.Join(h.staticPath, h.indexPath))
+			return
+		}
+	}
+
+	http.ServeFile(w, r, path)
 }
 
 func LoggingMiddleware(next http.Handler) http.Handler {

@@ -1,14 +1,13 @@
 <script>
     import "../app.css";
     import Navigation from "../lib/nav/Navigation.svelte";
+    import Header from "../lib/header/Header.svelte";
 </script>
 
 
 <div class="flex h-screen">
     <div class="flex-1 flex flex-col overflow-hidden">
-        <header class="flex justify-between items-center bg-gray-900 h-14 p-4">
-            <h1 class="text-5xl font-mono text-slate-200">Gaze</h1>
-        </header>
+        <Header/>
         <div class="flex h-full">
             <Navigation/>
             <main class="flex flex-col w-full  overflow-x-hidden overflow-y-auto  p-2">

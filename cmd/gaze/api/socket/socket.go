@@ -33,8 +33,6 @@ func WebSocketHttp(w http.ResponseWriter, r *http.Request) {
 }
 
 func util(ctx context.Context, c *websocket.Conn) error {
-	fmt.Println("starting at top")
-
 	typ, r, err := c.Reader(ctx)
 	if err != nil {
 		return err

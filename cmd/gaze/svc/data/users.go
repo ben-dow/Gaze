@@ -1,6 +1,6 @@
 package data
 
-type UserBase struct {
+type UserAuth struct {
 	UserId   string
 	Username string
 }

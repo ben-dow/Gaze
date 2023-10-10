@@ -15,7 +15,7 @@ func InitializeConfiguration() {
 
 	cfg := &Configuration{
 		DatabaseLocation: "gaze.db",
-		LogLevel:         1,
+		LogLevel:         0,
 		ServerAddress:    ":3000",
 	}
 

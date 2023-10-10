@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/ben-dow/Gaze/cmd/gaze/api/rest"
 	"github.com/ben-dow/Gaze/cmd/gaze/svc/config"
+	"github.com/ben-dow/Gaze/cmd/gaze/svc/data"
 	"github.com/ben-dow/Gaze/cmd/gaze/svc/db"
 	"github.com/ben-dow/Gaze/cmd/gaze/svc/logging"
 	"os"
@@ -22,10 +23,16 @@ func main() {
 
 	err := db.InitializeDatabase()
 	if err != nil {
-		logging.Error("could not initialize database connection %v", err)
+		logging.Error("could not initialize datastore connection %v", err)
 		return
 	}
 	logging.Debug("Database Loaded")
+
+	err = data.InitializeDataConfiguration()
+	if err != nil {
+		logging.Error("could not initialize data configuration", err)
+	}
+	logging.Debug("Data Configuration Loaded")
 
 	api := rest.NewRestApi(config.GetConfiguration().ServerAddress)
 	logging.Debug("API Initialized")
